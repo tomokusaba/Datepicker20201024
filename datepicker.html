@@ -1,0 +1,71 @@
+
+<html>
+<head><title>daptepicker sample</title></head>
+<body>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+
+<p>from: <input type="text" id="from1" />　
+to: <input type="text" id="to1" /></p>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<script>
+$(function() {
+  $("#from1").datepicker({
+    // from側の日付がdatepickerで選択されたらto側のdatepickerに日付制御を入れる
+    onSelect: function (selectedDate) {
+      $("#to1").datepicker("option", "minDate", selectedDate);
+    }
+  });
+  $("#from1").change(function () {
+    // テキストボックスに直接入力された時の制御
+    // YYYYMMDD or YYYY/MM/DD形式での入力を想定
+    var v = this.value;
+    if (v.length == 0) {
+      // from側の日付を消したときto側の日付制御を事実上外す
+      $("#to1").datepicker("option", "minDate", new Date(1900, 0, 1));
+    } else {
+      // 一旦、「/」を外して解析
+      var date_temp = this.value.replace(/\u002f/g, "");
+      var y = date_temp.substring(0, 4);
+      var m = date_temp.substring(4, 6);
+      var d = date_temp.substring(6, 8);
+      var di = new Date(y, m - 1, d);
+      // to側のdatepickerに日付制御を入れる
+      $("#to1").datepicker("option", "minDate", di);
+      // 解析したdateでテキストボックにYYYY/MM/DD形式で書き戻す
+      var yt = di.getFullYear();
+      var mt = di.getMonth() + 1;
+      var dt = di.getDate();
+      this.value = yt + "/" + mt + "/" + dt;
+    }
+  })
+  
+  $("#to1").datepicker({
+    onSelect: function (selectedDate) {
+      $("#from1").datepicker("option", "maxDate", selectedDate);
+    }
+  });
+  $("#to1").change(function () {
+    var v = this.value;
+    if (v.length == 0) {
+      $("#from1").datepicker("option", "maxDate", new Date(2200, 0, 1));
+    } else {
+      var date_temp = v.replace(/\u002f/g, "");
+      var y = date_temp.substring(0, 4);
+      var m = date_temp.substring(4, 6);
+      var d = date_temp.substring(6, 8);
+      var di = new Date(y, m - 1, d);
+
+      $("#from1").datepicker("option", "maxDate", di);
+      var yt = di.getFullYear();
+      var mt = di.getMonth() + 1;
+      var dt = di.getDate();
+      this.value = yt + "/" + mt + "/" + dt;
+    }
+  })
+});
+</script>
+
+</body>
